@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         L站收藏夹（分类管理）
 // @namespace    http://tampermonkey.net/
-// @version      0.1.6
+// @version      0.1.7
 // @description  LINUX DO 书签分类管理：侧边栏入口 + 悬浮按钮 + 右侧抽屉（API模式）
 // @author       huanchong
 // @match        https://linux.do/*
@@ -22,7 +22,8 @@
     UI: `${KEY_PREFIX}:ui`,
     RATE: `${KEY_PREFIX}:rate`,
     SNAPSHOT: `${KEY_PREFIX}:snapshot`,
-    READER_SIZE_OVERRIDES: `${KEY_PREFIX}:reader_size_overrides`
+    READER_SIZE_OVERRIDES: `${KEY_PREFIX}:reader_size_overrides`,
+    USERNAME_CACHE: `${KEY_PREFIX}:username_cache`
   };
   const CROSS_TAB_EVENT_KEY = `${KEY_PREFIX}:cross_tab_event`;
   const TAB_ID = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -62,6 +63,7 @@
 
   const state = {
     bookmarkUrl: FIXED_BOOKMARKS_API_URL,
+    cachedUsername: '',
     drawerOpen: false,
     viewMode: 'reader',
     readerTopCollapsed: true,
@@ -432,6 +434,7 @@
     const ui = GM_getValue(STORE_KEYS.UI, {});
     const rate = GM_getValue(STORE_KEYS.RATE, null);
     const readerSizeOverrides = GM_getValue(STORE_KEYS.READER_SIZE_OVERRIDES, {});
+    const cachedUsername = GM_getValue(STORE_KEYS.USERNAME_CACHE, '');
 
     state.categories = categories;
     state.assignments = typeof assignments === 'object' && assignments ? assignments : {};
@@ -449,6 +452,7 @@
 
     ensureValidActiveCategory();
     state.bookmarkUrl = FIXED_BOOKMARKS_API_URL;
+    state.cachedUsername = normalizeDiscourseUsername(cachedUsername);
 
     if (rate && typeof rate === 'object') {
       const requestTimes = Array.isArray(rate.requestTimes) ? rate.requestTimes : [];
@@ -506,6 +510,15 @@
       sessionRequestCount: state.rate.sessionRequestCount,
       manualRefreshHits: state.rate.manualRefreshHits.slice(-50)
     });
+  }
+
+  function saveCachedUsername(username) {
+    const normalized = normalizeDiscourseUsername(username);
+    if (!normalized) return '';
+    if (state.cachedUsername === normalized) return normalized;
+    state.cachedUsername = normalized;
+    GM_setValue(STORE_KEYS.USERNAME_CACHE, normalized);
+    return normalized;
   }
 
   function clearRateBecauseManualReload() {
@@ -737,7 +750,9 @@
     const preloadedElement = document.getElementById('data-preloaded');
     if (!preloadedElement) return '';
 
-    const rawPreloaded = String(preloadedElement.getAttribute('data-preloaded') || '').trim();
+    const attrRaw = String(preloadedElement.getAttribute('data-preloaded') || '').trim();
+    const textRaw = String(preloadedElement.textContent || '').trim();
+    const rawPreloaded = attrRaw || textRaw;
     if (!rawPreloaded) return '';
 
     const preloadedPayload = safeJsonParse(rawPreloaded, null);
@@ -764,6 +779,57 @@
     }
   }
 
+  function detectUsernameFromHeaderCurrentUserLink() {
+    const selectors = [
+      '.d-header .current-user a[href*="/u/"]',
+      '.d-header-icons .current-user a[href*="/u/"]',
+      '.d-header a.header-dropdown-toggle[href*="/u/"]',
+      '.d-header-icons a.header-dropdown-toggle[href*="/u/"]'
+    ];
+
+    for (const selector of selectors) {
+      const node = document.querySelector(selector);
+      if (!node) continue;
+      const hrefRaw = String(node.getAttribute('href') || '').trim();
+      if (!hrefRaw) continue;
+
+      let pathname = '';
+      try {
+        pathname = new URL(hrefRaw, window.location.origin).pathname || '';
+      } catch {
+        pathname = hrefRaw;
+      }
+
+      const match = pathname.match(/\/u\/([^/?#]+)/i);
+      if (!match) continue;
+      const encoded = String(match[1] || '').trim();
+      if (!encoded) continue;
+
+      try {
+        const decoded = decodeURIComponent(encoded);
+        const normalized = normalizeDiscourseUsername(decoded);
+        if (normalized) return normalized;
+      } catch {
+        // Ignore decode errors and keep raw fallback.
+      }
+
+      const normalized = normalizeDiscourseUsername(encoded);
+      if (normalized) return normalized;
+    }
+
+    return '';
+  }
+
+  function createResolvedApiContext(username, source, fallback = false) {
+    const normalized = normalizeDiscourseUsername(username);
+    if (normalized) {
+      saveCachedUsername(normalized);
+    }
+    const url = normalized ? buildBookmarksApiUrlByUsername(normalized) : FIXED_BOOKMARKS_API_URL;
+    state.bookmarkUrl = url;
+    return { url, username: normalized, source, fallback };
+  }
+
   async function detectUsernameFromSessionApi({ manual = false } = {}) {
     try {
       const payload = await requestJson('/session/current.json', {
@@ -780,38 +846,37 @@
   }
 
   async function resolveBookmarkApiContext({ manual = false, allowNetwork = true } = {}) {
-    const fallbackUsername = extractUsernameFromBookmarksApiUrl(FIXED_BOOKMARKS_API_URL);
+    const fallbackUsername = normalizeDiscourseUsername(state.cachedUsername)
+      || extractUsernameFromBookmarksApiUrl(FIXED_BOOKMARKS_API_URL);
 
     const preloadedUsername = detectUsernameFromPreloadedStore();
     if (preloadedUsername) {
-      const url = buildBookmarksApiUrlByUsername(preloadedUsername);
-      state.bookmarkUrl = url;
-      return { url, username: preloadedUsername, source: 'preloaded', fallback: false };
+      return createResolvedApiContext(preloadedUsername, 'preloaded', false);
     }
 
     const mentionCssUsername = detectUsernameFromCurrentUserMentionCss();
     if (mentionCssUsername) {
-      const url = buildBookmarksApiUrlByUsername(mentionCssUsername);
-      state.bookmarkUrl = url;
-      return { url, username: mentionCssUsername, source: 'mention-css', fallback: false };
+      return createResolvedApiContext(mentionCssUsername, 'mention-css', false);
+    }
+
+    const headerUsername = detectUsernameFromHeaderCurrentUserLink();
+    if (headerUsername) {
+      return createResolvedApiContext(headerUsername, 'header-link', false);
+    }
+
+    const cachedUsername = normalizeDiscourseUsername(state.cachedUsername);
+    if (cachedUsername) {
+      return createResolvedApiContext(cachedUsername, 'cache', false);
     }
 
     if (allowNetwork) {
       const sessionUsername = await detectUsernameFromSessionApi({ manual });
       if (sessionUsername) {
-        const url = buildBookmarksApiUrlByUsername(sessionUsername);
-        state.bookmarkUrl = url;
-        return { url, username: sessionUsername, source: 'session-api', fallback: false };
+        return createResolvedApiContext(sessionUsername, 'session-api', false);
       }
     }
 
-    state.bookmarkUrl = FIXED_BOOKMARKS_API_URL;
-    return {
-      url: FIXED_BOOKMARKS_API_URL,
-      username: fallbackUsername,
-      source: 'fallback',
-      fallback: true
-    };
+    return createResolvedApiContext(fallbackUsername, 'fallback', true);
   }
 
   function isTopicPageRoute(pathnameLike = window.location.pathname) {
