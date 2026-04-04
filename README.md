@@ -1,6 +1,6 @@
 # linuxDoBookmarkManage
 
-本脚本为二次开发，原作者地址：huanchong《L站收藏夹》你的 L 站必备油猴脚本（3 级福利）。
+本脚本为二次开发，原作者地址：huanchong《L站收藏夹》你的 L 站必备油猴脚本（3 级福利）<https://linux.do/t/topic/1684359>。
 
 > 当前版本没有在其他账号做过完整测试，可能存在 bug。
 
