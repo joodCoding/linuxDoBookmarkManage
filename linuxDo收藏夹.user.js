@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         L站收藏夹（分类管理）
+// @name         L站收藏夹（双向增强版 jood）
 // @namespace    http://tampermonkey.net/
-// @version      0.1.7
-// @description  LINUX DO 书签分类管理：侧边栏入口 + 悬浮按钮 + 右侧抽屉（API模式）
-// @author       huanchong
+// @version      1.0
+// @description  LINUX DO 书签分类管理：缓存和服务器双向绑定，自定义你的阅读窗口）
+// @author       huanchong & jood
 // @match        https://linux.do/*
 // @grant        GM_addStyle
 // @grant        GM_getValue
