@@ -1603,10 +1603,10 @@
         const nextModeLabel = getReaderTileModeLabel(getNextReaderTileMode(sizeMode));
         const mainTag = Array.isArray(item.tags) && item.tags.length ? item.tags[0] : '未标注';
         const baseHue = hashStringToHue(mainTag);
-        const hueShift = Math.round(normalized * 36 * state.readerColorBoost);
+        const hueShift = Math.round(normalized * 30 * state.readerColorBoost);
         const hue = (baseHue + hueShift) % 360;
-        const sat = Math.round(clampNumber(38 + state.readerColorBoost * 14, 28, 62, 48));
-        const light = Math.round(clampNumber(96 - normalized * 12 * state.readerColorBoost, 78, 97, 92));
+        const sat = Math.round(clampNumber(55 + state.readerColorBoost * 16, 42, 78, 62));
+        const light = Math.round(clampNumber(95 - normalized * 8 * state.readerColorBoost, 84, 97, 93));
         const categoryId = state.assignments[String(item.topicId)] || DEFAULT_CATEGORY_ID;
         const categoryName = getCategoryNameById(categoryId);
         const topicText = item.postNumber > 1 ? `#${item.topicId}/${item.postNumber}` : `#${item.topicId}`;
@@ -1660,12 +1660,12 @@
         const dim = getReaderBubbleDimensions(resolvedSize);
         const mainTag = Array.isArray(item.tags) && item.tags.length ? item.tags[0] : '未标注';
         const baseHue = hashStringToHue(mainTag);
-        const hueShift = Math.round(normalized * 36 * state.readerColorBoost);
+        const hueShift = Math.round(normalized * 30 * state.readerColorBoost);
         const hue = (baseHue + hueShift) % 360;
-        const sat = Math.round(clampNumber(38 + state.readerColorBoost * 14, 28, 62, 48));
-        const light = Math.round(clampNumber(96 - normalized * 12 * state.readerColorBoost, 78, 97, 92));
-        const bubbleSat = Math.round(clampNumber(sat - 4, 24, 58, 44));
-        const bubbleLight = Math.round(clampNumber(light + 2, 82, 98, 94));
+        const sat = Math.round(clampNumber(55 + state.readerColorBoost * 16, 42, 78, 62));
+        const light = Math.round(clampNumber(95 - normalized * 8 * state.readerColorBoost, 84, 97, 93));
+        const bubbleSat = Math.round(clampNumber(sat + 2, 44, 80, 64));
+        const bubbleLight = Math.round(clampNumber(light - 1, 83, 96, 92));
         const categoryId = state.assignments[String(item.topicId)] || DEFAULT_CATEGORY_ID;
         const categoryName = getCategoryNameById(categoryId);
         const topicText = item.postNumber > 1 ? `#${item.topicId}/${item.postNumber}` : `#${item.topicId}`;
@@ -3541,17 +3541,18 @@
       }
 
       .ldbm-reader-cat {
-        height: 32px;
-        border: 1px solid var(--primary-low, #d0d0d0);
+        height: 34px;
+        border: 1.5px solid rgba(196, 181, 253, 0.3);
         border-radius: 999px;
-        background: transparent;
-        padding: 0 12px;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 0 14px;
         font-size: 13px;
+        font-weight: 500;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+        transition: all .2s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
       .ldbm-reader-cat .count {
@@ -3560,14 +3561,16 @@
       }
 
       .ldbm-reader-cat:hover {
-        background: var(--primary-very-low, rgba(0, 0, 0, 0.04));
-        border-color: var(--primary-low-mid, rgba(0, 0, 0, 0.15));
+        background: rgba(243, 232, 255, 0.45);
+        border-color: rgba(168, 132, 252, 0.35);
+        transform: translateY(-1px);
       }
 
       .ldbm-reader-cat.active {
-        background: var(--tertiary-low, rgba(0, 132, 255, 0.12));
-        border-color: rgba(0, 132, 255, 0.35);
-        box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.08);
+        background: rgba(237, 228, 255, 0.65);
+        border-color: rgba(147, 112, 219, 0.45);
+        box-shadow: 0 0 0 3px rgba(147, 112, 219, 0.1), 0 2px 8px rgba(147, 112, 219, 0.12);
+        font-weight: 600;
       }
 
       .ldbm-search,
@@ -3702,7 +3705,7 @@
 
       .ldbm-entry-grid {
         display: grid;
-        gap: 10px;
+        gap: 12px;
         grid-auto-flow: dense;
         grid-auto-rows: 88px;
         grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -3713,13 +3716,14 @@
         width: 100%;
         height: clamp(460px, 74vh, 940px);
         min-height: 420px;
-        border-radius: 16px;
-        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 24px;
+        border: 1.5px solid rgba(219, 182, 255, 0.25);
         background:
-          radial-gradient(circle at 18% 16%, rgba(59, 130, 246, 0.06), transparent 40%),
-          radial-gradient(circle at 82% 78%, rgba(168, 85, 247, 0.05), transparent 35%),
-          radial-gradient(circle at 80% 14%, rgba(16, 185, 129, 0.06), transparent 32%),
-          linear-gradient(180deg, rgba(15, 23, 42, 0.015), rgba(15, 23, 42, 0.008));
+          radial-gradient(ellipse at 15% 20%, rgba(251, 191, 207, 0.12), transparent 45%),
+          radial-gradient(ellipse at 85% 15%, rgba(196, 181, 253, 0.1), transparent 40%),
+          radial-gradient(ellipse at 50% 85%, rgba(167, 243, 208, 0.08), transparent 42%),
+          radial-gradient(ellipse at 80% 75%, rgba(253, 224, 167, 0.07), transparent 35%),
+          linear-gradient(160deg, rgba(252, 231, 243, 0.06), rgba(237, 233, 254, 0.04));
         overflow: hidden;
         touch-action: none;
         cursor: grab;
@@ -3751,30 +3755,37 @@
         grid-template-rows: auto minmax(0, 1fr) auto;
         gap: var(--bubble-gap);
         padding: var(--bubble-vpad) var(--bubble-hpad);
-        border-radius: 16px;
-        border: 1px solid hsl(var(--entry-hue) calc(var(--entry-sat) - 6%) calc(var(--entry-light) - 8%));
+        border-radius: 22px;
+        border: 1.5px solid hsl(var(--entry-hue) calc(var(--entry-sat) + 5%) calc(var(--entry-light) - 6%) / 0.45);
         background: linear-gradient(
-          160deg,
-          hsl(var(--entry-hue) var(--entry-sat) var(--entry-light)),
-          hsl(var(--entry-hue) calc(var(--entry-sat) - 6%) calc(var(--entry-light) - 5%))
+          145deg,
+          hsl(var(--entry-hue) var(--entry-sat) var(--entry-light) / 0.85),
+          hsl(var(--entry-hue) calc(var(--entry-sat) + 8%) calc(var(--entry-light) - 4%) / 0.75)
         );
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.04);
-        transition: box-shadow .2s ease, border-color .2s ease;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow:
+          0 4px 20px hsl(var(--entry-hue) calc(var(--entry-sat) + 10%) 70% / 0.18),
+          0 1px 4px rgba(0, 0, 0, 0.04);
+        transition: box-shadow .25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color .2s ease;
         overflow: hidden;
         user-select: none;
         touch-action: none;
       }
 
       .ldbm-bubble-item:hover {
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06);
-        border-color: hsl(var(--entry-hue) calc(var(--entry-sat) + 4%) calc(var(--entry-light) - 14%));
+        box-shadow:
+          0 8px 30px hsl(var(--entry-hue) calc(var(--entry-sat) + 15%) 65% / 0.28),
+          0 2px 8px rgba(0, 0, 0, 0.06);
+        border-color: hsl(var(--entry-hue) calc(var(--entry-sat) + 12%) calc(var(--entry-light) - 10%) / 0.6);
       }
 
       .ldbm-bubble-item::before {
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.28));
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.3));
+        border-radius: inherit;
         pointer-events: none;
         z-index: 0;
       }
@@ -3822,21 +3833,26 @@
       }
 
       .ldbm-bubble-tag {
-        font-size: calc(11px * var(--bubble-font-scale));
+        font-size: calc(10.5px * var(--bubble-font-scale));
         font-weight: 700;
-        letter-spacing: .01em;
-        color: #0b1220;
+        letter-spacing: .02em;
+        color: hsl(var(--entry-hue) calc(var(--entry-sat) + 20%) 28%);
+        background: hsl(var(--entry-hue) calc(var(--entry-sat) + 10%) calc(var(--entry-light) + 2%) / 0.6);
+        padding: 2px 8px;
+        border-radius: 999px;
+        line-height: 1.4;
       }
 
       .ldbm-bubble-score {
-        font-size: calc(11px * var(--bubble-font-scale));
-        color: #0b1220;
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(15, 23, 42, 0.2);
+        font-size: calc(10.5px * var(--bubble-font-scale));
+        font-weight: 600;
+        color: hsl(var(--entry-hue) calc(var(--entry-sat) + 15%) 30%);
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid hsl(var(--entry-hue) var(--entry-sat) calc(var(--entry-light) - 5%) / 0.35);
         border-radius: 999px;
-        padding: 0 calc(8px * var(--bubble-font-scale));
+        padding: 1px calc(9px * var(--bubble-font-scale));
         line-height: calc(20px * var(--bubble-font-scale));
-        transition: background .15s ease;
+        transition: background .15s ease, transform .2s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
       .ldbm-bubble-title {
@@ -3845,17 +3861,17 @@
         -webkit-line-clamp: 2;
         overflow: hidden;
         text-decoration: none;
-        color: #0f172a;
+        color: #1e293b;
         font-size: calc(14px * var(--bubble-font-scale));
         font-weight: 700;
         line-height: 1.35;
-        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-        transition: color .15s ease;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+        transition: color .18s ease;
         word-break: break-word;
       }
 
       .ldbm-bubble-title:hover {
-        color: #1e40af;
+        color: hsl(var(--entry-hue) 60% 40%);
       }
 
       .ldbm-bubble-item[data-size="l"] .ldbm-bubble-title {
@@ -3872,7 +3888,7 @@
         gap: 8px;
         align-items: center;
         font-size: calc(11px * var(--bubble-font-scale));
-        color: #374151;
+        color: #4b5563;
         font-weight: 500;
         text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
       }
@@ -3894,9 +3910,9 @@
         bottom: 5px;
         width: 14px;
         height: 14px;
-        border-right: 2px solid rgba(15, 23, 42, 0.34);
-        border-bottom: 2px solid rgba(15, 23, 42, 0.34);
-        border-radius: 0 0 3px 0;
+        border-right: 2px solid hsl(var(--entry-hue) var(--entry-sat) 60% / 0.4);
+        border-bottom: 2px solid hsl(var(--entry-hue) var(--entry-sat) 60% / 0.4);
+        border-radius: 0 0 6px 0;
         cursor: nwse-resize;
         opacity: 0.65;
         z-index: 2;
@@ -3913,26 +3929,32 @@
         --entry-vpad: 10px;
         --entry-hpad: 11px;
         text-decoration: none;
-        border: 1px solid hsl(var(--entry-hue) calc(var(--entry-sat) - 6%) calc(var(--entry-light) - 8%));
+        border: 1.5px solid hsl(var(--entry-hue) calc(var(--entry-sat) + 5%) calc(var(--entry-light) - 6%) / 0.4);
         background: linear-gradient(
-          165deg,
-          hsl(var(--entry-hue) var(--entry-sat) var(--entry-light)),
-          hsl(var(--entry-hue) calc(var(--entry-sat) - 8%) calc(var(--entry-light) - 6%))
+          145deg,
+          hsl(var(--entry-hue) var(--entry-sat) var(--entry-light) / 0.9),
+          hsl(var(--entry-hue) calc(var(--entry-sat) + 6%) calc(var(--entry-light) - 4%) / 0.8)
         );
-        color: #0f172a;
-        border-radius: 14px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        color: #1e293b;
+        border-radius: 20px;
         padding: var(--entry-vpad) var(--entry-hpad);
         display: grid;
         grid-template-rows: auto minmax(0, 1fr) auto;
         gap: var(--entry-gap);
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
-        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        box-shadow:
+          0 3px 14px hsl(var(--entry-hue) calc(var(--entry-sat) + 8%) 72% / 0.15),
+          0 1px 3px rgba(0, 0, 0, 0.03);
+        transition: transform .25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .25s ease, border-color .2s ease;
       }
 
       .ldbm-entry-tile:hover {
-        transform: translateY(-2px) scale(1.01);
-        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1), 0 2px 4px rgba(15, 23, 42, 0.04);
-        border-color: hsl(var(--entry-hue) calc(var(--entry-sat) + 4%) calc(var(--entry-light) - 14%));
+        transform: translateY(-4px) scale(1.02);
+        box-shadow:
+          0 8px 28px hsl(var(--entry-hue) calc(var(--entry-sat) + 12%) 68% / 0.25),
+          0 2px 6px rgba(0, 0, 0, 0.05);
+        border-color: hsl(var(--entry-hue) calc(var(--entry-sat) + 10%) calc(var(--entry-light) - 10%) / 0.55);
       }
 
       .ldbm-entry-tile[data-size="s"] {
@@ -3984,18 +4006,20 @@
         height: calc(20px * var(--entry-font-scale));
         padding: 0 7px;
         border-radius: 999px;
-        border: 1px solid rgba(15, 23, 42, 0.2);
-        background: rgba(255, 255, 255, 0.62);
+        border: 1px solid hsl(var(--entry-hue) var(--entry-sat) calc(var(--entry-light) - 5%) / 0.3);
+        background: rgba(255, 255, 255, 0.7);
         color: #0f172a;
         font-size: calc(10px * var(--entry-font-scale));
         font-weight: 600;
         line-height: 1;
         user-select: none;
         cursor: pointer;
+        transition: background .15s ease, transform .2s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
       .ldbm-entry-size-btn:hover {
-        background: rgba(255, 255, 255, 0.86);
+        background: rgba(255, 255, 255, 0.92);
+        transform: scale(1.08);
       }
 
       .ldbm-entry-size-btn:focus-visible {
@@ -4004,18 +4028,24 @@
       }
 
       .ldbm-entry-tag {
-        font-size: calc(11px * var(--entry-font-scale));
-        font-weight: 600;
-        letter-spacing: .01em;
+        font-size: calc(10.5px * var(--entry-font-scale));
+        font-weight: 700;
+        letter-spacing: .02em;
+        color: hsl(var(--entry-hue) calc(var(--entry-sat) + 20%) 28%);
+        background: hsl(var(--entry-hue) calc(var(--entry-sat) + 10%) calc(var(--entry-light) + 2%) / 0.55);
+        padding: 2px 8px;
+        border-radius: 999px;
+        line-height: 1.4;
       }
 
       .ldbm-entry-score {
-        font-size: calc(11px * var(--entry-font-scale));
-        color: #0f172a;
-        background: rgba(255, 255, 255, 0.65);
-        border: 1px solid rgba(15, 23, 42, 0.14);
+        font-size: calc(10.5px * var(--entry-font-scale));
+        font-weight: 600;
+        color: hsl(var(--entry-hue) calc(var(--entry-sat) + 15%) 30%);
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid hsl(var(--entry-hue) var(--entry-sat) calc(var(--entry-light) - 5%) / 0.3);
         border-radius: 999px;
-        padding: 0 calc(8px * var(--entry-font-scale));
+        padding: 1px calc(9px * var(--entry-font-scale));
         line-height: calc(20px * var(--entry-font-scale));
       }
 
