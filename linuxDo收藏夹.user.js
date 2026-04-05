@@ -1603,10 +1603,10 @@
         const nextModeLabel = getReaderTileModeLabel(getNextReaderTileMode(sizeMode));
         const mainTag = Array.isArray(item.tags) && item.tags.length ? item.tags[0] : '未标注';
         const baseHue = hashStringToHue(mainTag);
-        const hueShift = Math.round(normalized * 48 * state.readerColorBoost);
+        const hueShift = Math.round(normalized * 36 * state.readerColorBoost);
         const hue = (baseHue + hueShift) % 360;
-        const sat = Math.round(clampNumber(52 + state.readerColorBoost * 18, 40, 88, 62));
-        const light = Math.round(clampNumber(94 - normalized * 18 * state.readerColorBoost, 64, 95, 88));
+        const sat = Math.round(clampNumber(38 + state.readerColorBoost * 14, 28, 62, 48));
+        const light = Math.round(clampNumber(96 - normalized * 12 * state.readerColorBoost, 78, 97, 92));
         const categoryId = state.assignments[String(item.topicId)] || DEFAULT_CATEGORY_ID;
         const categoryName = getCategoryNameById(categoryId);
         const topicText = item.postNumber > 1 ? `#${item.topicId}/${item.postNumber}` : `#${item.topicId}`;
@@ -1660,12 +1660,12 @@
         const dim = getReaderBubbleDimensions(resolvedSize);
         const mainTag = Array.isArray(item.tags) && item.tags.length ? item.tags[0] : '未标注';
         const baseHue = hashStringToHue(mainTag);
-        const hueShift = Math.round(normalized * 48 * state.readerColorBoost);
+        const hueShift = Math.round(normalized * 36 * state.readerColorBoost);
         const hue = (baseHue + hueShift) % 360;
-        const sat = Math.round(clampNumber(52 + state.readerColorBoost * 18, 40, 88, 62));
-        const light = Math.round(clampNumber(94 - normalized * 18 * state.readerColorBoost, 64, 95, 88));
-        const bubbleSat = Math.round(clampNumber(sat - 6, 36, 82, 58));
-        const bubbleLight = Math.round(clampNumber(light + 6, 72, 96, 90));
+        const sat = Math.round(clampNumber(38 + state.readerColorBoost * 14, 28, 62, 48));
+        const light = Math.round(clampNumber(96 - normalized * 12 * state.readerColorBoost, 78, 97, 92));
+        const bubbleSat = Math.round(clampNumber(sat - 4, 24, 58, 44));
+        const bubbleLight = Math.round(clampNumber(light + 2, 82, 98, 94));
         const categoryId = state.assignments[String(item.topicId)] || DEFAULT_CATEGORY_ID;
         const categoryName = getCategoryNameById(categoryId);
         const topicText = item.postNumber > 1 ? `#${item.topicId}/${item.postNumber}` : `#${item.topicId}`;
@@ -3551,6 +3551,7 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
       }
 
       .ldbm-reader-cat .count {
@@ -3558,9 +3559,15 @@
         font-size: 12px;
       }
 
+      .ldbm-reader-cat:hover {
+        background: var(--primary-very-low, rgba(0, 0, 0, 0.04));
+        border-color: var(--primary-low-mid, rgba(0, 0, 0, 0.15));
+      }
+
       .ldbm-reader-cat.active {
         background: var(--tertiary-low, rgba(0, 132, 255, 0.12));
         border-color: rgba(0, 132, 255, 0.35);
+        box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.08);
       }
 
       .ldbm-search,
@@ -3707,11 +3714,12 @@
         height: clamp(460px, 74vh, 940px);
         min-height: 420px;
         border-radius: 16px;
-        border: 1px dashed rgba(15, 23, 42, 0.18);
+        border: 1px solid rgba(15, 23, 42, 0.08);
         background:
-          radial-gradient(circle at 18% 16%, rgba(59, 130, 246, 0.08), transparent 38%),
-          radial-gradient(circle at 80% 14%, rgba(16, 185, 129, 0.08), transparent 30%),
-          linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.01));
+          radial-gradient(circle at 18% 16%, rgba(59, 130, 246, 0.06), transparent 40%),
+          radial-gradient(circle at 82% 78%, rgba(168, 85, 247, 0.05), transparent 35%),
+          radial-gradient(circle at 80% 14%, rgba(16, 185, 129, 0.06), transparent 32%),
+          linear-gradient(180deg, rgba(15, 23, 42, 0.015), rgba(15, 23, 42, 0.008));
         overflow: hidden;
         touch-action: none;
         cursor: grab;
@@ -3744,23 +3752,29 @@
         gap: var(--bubble-gap);
         padding: var(--bubble-vpad) var(--bubble-hpad);
         border-radius: 16px;
-        border: 1px solid hsl(var(--entry-hue) var(--entry-sat) calc(var(--entry-light) - 12%));
+        border: 1px solid hsl(var(--entry-hue) calc(var(--entry-sat) - 6%) calc(var(--entry-light) - 8%));
         background: linear-gradient(
           160deg,
           hsl(var(--entry-hue) var(--entry-sat) var(--entry-light)),
-          hsl(var(--entry-hue) calc(var(--entry-sat) - 8%) calc(var(--entry-light) - 8%))
+          hsl(var(--entry-hue) calc(var(--entry-sat) - 6%) calc(var(--entry-light) - 5%))
         );
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.04);
+        transition: box-shadow .2s ease, border-color .2s ease;
         overflow: hidden;
         user-select: none;
         touch-action: none;
+      }
+
+      .ldbm-bubble-item:hover {
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06);
+        border-color: hsl(var(--entry-hue) calc(var(--entry-sat) + 4%) calc(var(--entry-light) - 14%));
       }
 
       .ldbm-bubble-item::before {
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.18));
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.28));
         pointer-events: none;
         z-index: 0;
       }
@@ -3822,6 +3836,7 @@
         border-radius: 999px;
         padding: 0 calc(8px * var(--bubble-font-scale));
         line-height: calc(20px * var(--bubble-font-scale));
+        transition: background .15s ease;
       }
 
       .ldbm-bubble-title {
@@ -3830,12 +3845,17 @@
         -webkit-line-clamp: 2;
         overflow: hidden;
         text-decoration: none;
-        color: #020617;
+        color: #0f172a;
         font-size: calc(14px * var(--bubble-font-scale));
         font-weight: 700;
         line-height: 1.35;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+        transition: color .15s ease;
         word-break: break-word;
+      }
+
+      .ldbm-bubble-title:hover {
+        color: #1e40af;
       }
 
       .ldbm-bubble-item[data-size="l"] .ldbm-bubble-title {
@@ -3852,8 +3872,9 @@
         gap: 8px;
         align-items: center;
         font-size: calc(11px * var(--bubble-font-scale));
-        color: #1f2937;
+        color: #374151;
         font-weight: 500;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
       }
 
       .ldbm-bubble-meta span {
@@ -3879,6 +3900,7 @@
         cursor: nwse-resize;
         opacity: 0.65;
         z-index: 2;
+        transition: opacity .15s ease;
       }
 
       .ldbm-bubble-item:hover .ldbm-bubble-resize {
@@ -3891,7 +3913,7 @@
         --entry-vpad: 10px;
         --entry-hpad: 11px;
         text-decoration: none;
-        border: 1px solid hsl(var(--entry-hue) var(--entry-sat) calc(var(--entry-light) - 12%));
+        border: 1px solid hsl(var(--entry-hue) calc(var(--entry-sat) - 6%) calc(var(--entry-light) - 8%));
         background: linear-gradient(
           165deg,
           hsl(var(--entry-hue) var(--entry-sat) var(--entry-light)),
@@ -3903,13 +3925,14 @@
         display: grid;
         grid-template-rows: auto minmax(0, 1fr) auto;
         gap: var(--entry-gap);
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-        transition: transform .12s ease, box-shadow .12s ease;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
       }
 
       .ldbm-entry-tile:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1), 0 2px 4px rgba(15, 23, 42, 0.04);
+        border-color: hsl(var(--entry-hue) calc(var(--entry-sat) + 4%) calc(var(--entry-light) - 14%));
       }
 
       .ldbm-entry-tile[data-size="s"] {
