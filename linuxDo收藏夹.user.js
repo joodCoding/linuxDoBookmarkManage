@@ -3759,14 +3759,13 @@
           hsl(var(--entry-hue) calc(var(--entry-sat) - 6%) calc(var(--entry-light) - 5%))
         );
         box-shadow: 0 4px 16px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.04);
-        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        transition: box-shadow .2s ease, border-color .2s ease;
         overflow: hidden;
         user-select: none;
         touch-action: none;
       }
 
       .ldbm-bubble-item:hover {
-        transform: translateY(-2px) scale(1.015);
         box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06);
         border-color: hsl(var(--entry-hue) calc(var(--entry-sat) + 4%) calc(var(--entry-light) - 14%));
       }
